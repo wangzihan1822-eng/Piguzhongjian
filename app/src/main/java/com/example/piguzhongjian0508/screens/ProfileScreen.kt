@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -44,7 +43,6 @@ fun ProfileScreen(onOpenSettings: () -> Unit) {
             items(items) { item ->
                 ProfileListItem(
                     title = item,
-                    isSettings = item == "设置",
                     onClick = if (item == "设置") onOpenSettings else null,
                 )
                 HorizontalDivider()
@@ -56,7 +54,6 @@ fun ProfileScreen(onOpenSettings: () -> Unit) {
 @Composable
 private fun ProfileListItem(
     title: String,
-    isSettings: Boolean,
     onClick: (() -> Unit)?,
 ) {
     ListItem(
@@ -66,11 +63,6 @@ private fun ProfileListItem(
             Modifier
         },
         headlineContent = { Text(title) },
-        leadingContent = if (isSettings) {
-            { Icon(Icons.Filled.Settings, contentDescription = null) }
-        } else {
-            null
-        },
         trailingContent = {
             Icon(Icons.Filled.ChevronRight, contentDescription = null)
         },

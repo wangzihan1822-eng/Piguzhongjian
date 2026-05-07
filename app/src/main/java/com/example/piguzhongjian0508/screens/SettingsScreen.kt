@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -56,7 +55,6 @@ fun SettingsScreen(
             items(items) { item ->
                 SettingsListItem(
                     title = item,
-                    isPrivacy = item == "隐私设置",
                     onClick = if (item == "隐私设置") onOpenPrivacySettings else null,
                 )
                 HorizontalDivider()
@@ -68,7 +66,6 @@ fun SettingsScreen(
 @Composable
 private fun SettingsListItem(
     title: String,
-    isPrivacy: Boolean,
     onClick: (() -> Unit)?,
 ) {
     ListItem(
@@ -78,11 +75,6 @@ private fun SettingsListItem(
             Modifier
         },
         headlineContent = { Text(title) },
-        leadingContent = if (isPrivacy) {
-            { Icon(Icons.Filled.Lock, contentDescription = null) }
-        } else {
-            null
-        },
         trailingContent = {
             Icon(Icons.Filled.ChevronRight, contentDescription = null)
         },
