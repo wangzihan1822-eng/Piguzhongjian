@@ -4,21 +4,26 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +36,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.piguzhongjian0508.R
 import com.example.piguzhongjian0508.state.ButtCrackViewModel
+import com.example.piguzhongjian0508.ui.components.SoftHeader
+import com.example.piguzhongjian0508.ui.components.SoftSurface
+import com.example.piguzhongjian0508.ui.theme.SoftAccent
+import com.example.piguzhongjian0508.ui.theme.SoftForeground
+import com.example.piguzhongjian0508.ui.theme.SoftWarning
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,8 +66,9 @@ fun HealthScreen(viewModel: ButtCrackViewModel) {
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            CenterAlignedTopAppBar(title = { Text("健康状况") })
+            SoftHeader(title = "健康状况")
         },
     ) { innerPadding ->
         Column(
@@ -66,31 +78,148 @@ fun HealthScreen(viewModel: ButtCrackViewModel) {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            if (!isButtCrackClosed) {
-                AbnormalWarning()
-            }
+            HealthStatusMessage(isAbnormal = isButtCrackClosed)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
                 BearImagePanel(
-                    title = "正面",
-                    drawableRes = R.drawable.bear_front,
+                    title = "背面",
+                    drawableRes = if (isButtCrackClosed) {
+                        R.drawable.bear_back_alert
+                    } else {
+                        R.drawable.bear_back
+                    },
                     showImage = shouldShowBearImages,
                     modifier = Modifier.weight(1f),
                 )
                 BearImagePanel(
-                    title = "背面",
-                    drawableRes = if (isButtCrackClosed) {
-                        R.drawable.bear_back
-                    } else {
-                        R.drawable.bear_back_alert
-                    },
+                    title = "正面",
+                    drawableRes = R.drawable.bear_front,
                     showImage = shouldShowBearImages,
+                    imageModifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer(
+                            scaleX = 1.11f,
+                            scaleY = 1.30f,
+                        ),
                     modifier = Modifier.weight(1f),
+                )
+            }
+
+            HealthMetricsSection()
+        }
+    }
+}
+
+@Composable
+private fun HealthStatusMessage(isAbnormal: Boolean) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(86.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (isAbnormal) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = "重大风险：",
+                    color = SoftWarning,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = "您的屁股中间出现了一条缝",
+                    color = SoftWarning,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        } else {
+            Text(
+                text = "暂无重大风险",
+                color = Color(0xFF2E7D32),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+        }
+    }
+}
+
+@Composable
+private fun HealthMetricsSection() {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            HealthMetricCard(
+                title = "体重",
+                value = "250kg",
+                status = "正常",
+                statusColor = Color(0xFF2E7D32),
+                icon = {
+                    Icon(
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = "正常",
+                        tint = Color(0xFF2E7D32),
+                        modifier = Modifier.size(22.dp),
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
+            HealthMetricCard(
+                title = "体脂率",
+                value = "77.8%",
+                status = "偏高",
+                statusColor = SoftWarning,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowUpward,
+                        contentDescription = "偏高",
+                        tint = SoftWarning,
+                        modifier = Modifier.size(22.dp),
+                    )
+                },
+                modifier = Modifier.weight(1f),
+            )
+        }
+
+        SoftSurface(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 18.dp, vertical = 14.dp),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    HealthInfoText(
+                        text = "评语&近期建议",
+                    )
+                    Icon(
+                        imageVector = Icons.Filled.MedicalServices,
+                        contentDescription = "医生建议",
+                        tint = SoftAccent,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+                HealthInfoText(
+                    text = "二百五，吃吃吧，可发布低脂作品以降低体脂率。",
                 )
             }
         }
@@ -98,27 +227,61 @@ fun HealthScreen(viewModel: ButtCrackViewModel) {
 }
 
 @Composable
-private fun AbnormalWarning() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+private fun HealthMetricCard(
+    title: String,
+    value: String,
+    status: String,
+    statusColor: Color,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SoftSurface(
+        modifier = modifier.heightIn(min = 76.dp),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
     ) {
-        Text(
-            text = "异常：",
-            color = Color.Red,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            text = "您的屁股中间出现了一条缝",
-            color = Color.Red,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                HealthInfoText(
+                    text = title,
+                )
+                icon()
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                HealthInfoText(
+                    text = value,
+                )
+                Text(
+                    text = status,
+                    color = statusColor,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
     }
+}
+
+@Composable
+private fun HealthInfoText(
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        color = SoftForeground,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+    )
 }
 
 @Composable
@@ -126,39 +289,38 @@ private fun BearImagePanel(
     title: String,
     drawableRes: Int,
     showImage: Boolean,
+    imageModifier: Modifier = Modifier.fillMaxSize(),
+    contentScale: ContentScale = ContentScale.Fit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = modifier.heightIn(min = 460.dp),
-        shape = MaterialTheme.shapes.medium,
-        tonalElevation = 2.dp,
-        color = MaterialTheme.colorScheme.surfaceContainer,
+    SoftSurface(
+        modifier = modifier.heightIn(min = 356.dp),
+        contentPadding = PaddingValues(12.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             Text(
                 text = title,
+                color = SoftForeground,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(360.dp)
-                    .sizeIn(maxHeight = 620.dp),
+                    .height(276.dp)
+                    .sizeIn(maxHeight = 520.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 if (showImage) {
                     Image(
                         painter = painterResource(drawableRes),
                         contentDescription = "熊${title}图",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit,
+                        modifier = imageModifier,
+                        contentScale = contentScale,
                     )
                 } else {
                     CircularProgressIndicator()

@@ -1,19 +1,29 @@
 package com.example.piguzhongjian0508.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.HeartBroken
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -28,6 +38,9 @@ import com.example.piguzhongjian0508.screens.PrivacySettingsScreen
 import com.example.piguzhongjian0508.screens.ProfileScreen
 import com.example.piguzhongjian0508.screens.SettingsScreen
 import com.example.piguzhongjian0508.state.ButtCrackViewModel
+import com.example.piguzhongjian0508.ui.components.SoftBottomTabItem
+import com.example.piguzhongjian0508.ui.components.SoftSurface
+import com.example.piguzhongjian0508.ui.theme.SoftBackground
 
 object AppRoute {
     const val Health = "health"
@@ -40,7 +53,7 @@ private data class BottomTab(
     val route: String,
     val title: String,
     val isSelected: (NavDestination?) -> Boolean,
-    val icon: @Composable () -> Unit,
+    val icon: @Composable (Color) -> Unit,
 )
 
 @Composable
@@ -50,6 +63,7 @@ fun PiguzhongjianApp(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val isButtCrackClosed by buttCrackViewModel.isButtCrackClosed.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -57,6 +71,7 @@ fun PiguzhongjianApp(
         bottomBar = {
             MainBottomBar(
                 currentDestination = currentDestination,
+                isButtCrackClosed = isButtCrackClosed,
                 onTabClick = { route -> navController.navigateToRootTab(route) },
             )
         },
@@ -93,6 +108,7 @@ fun PiguzhongjianApp(
 @Composable
 private fun MainBottomBar(
     currentDestination: NavDestination?,
+    isButtCrackClosed: Boolean,
     onTabClick: (String) -> Unit,
 ) {
     val profileRoutes = setOf(AppRoute.Profile, AppRoute.Settings, AppRoute.PrivacySettings)
@@ -103,7 +119,21 @@ private fun MainBottomBar(
             isSelected = { destination ->
                 destination?.hierarchy?.any { it.route == AppRoute.Health } == true
             },
-            icon = { Icon(Icons.Filled.Favorite, contentDescription = "健康状况") },
+            icon = {
+                Icon(
+                    imageVector = if (isButtCrackClosed) {
+                        Icons.Filled.HeartBroken
+                    } else {
+                        Icons.Filled.Favorite
+                    },
+                    contentDescription = "健康状况",
+                    tint = if (isButtCrackClosed) {
+                        Color(0xFFE53935)
+                    } else {
+                        Color(0xFF2E7D32)
+                    },
+                )
+            },
         ),
         BottomTab(
             route = AppRoute.Profile,
@@ -111,18 +141,40 @@ private fun MainBottomBar(
             isSelected = { destination ->
                 destination?.hierarchy?.any { it.route in profileRoutes } == true
             },
-            icon = { Icon(Icons.Filled.Person, contentDescription = "个人中心") },
+            icon = { tint ->
+                Icon(Icons.Filled.Person, contentDescription = "个人中心", tint = tint)
+            },
         ),
     )
 
-    NavigationBar {
-        tabs.forEach { tab ->
-            NavigationBarItem(
-                selected = tab.isSelected(currentDestination),
-                onClick = { onTabClick(tab.route) },
-                icon = tab.icon,
-                label = { Text(tab.title) },
-            )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(SoftBackground)
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+    ) {
+        SoftSurface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(76.dp),
+            shape = RoundedCornerShape(32.dp),
+            cornerRadius = 32.dp,
+            contentPadding = PaddingValues(10.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                tabs.forEach { tab ->
+                    SoftBottomTabItem(
+                        selected = tab.isSelected(currentDestination),
+                        title = tab.title,
+                        onClick = { onTabClick(tab.route) },
+                        icon = tab.icon,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
         }
     }
 }

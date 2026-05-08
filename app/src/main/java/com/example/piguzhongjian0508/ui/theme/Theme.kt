@@ -13,18 +13,21 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    surfaceContainer = Color(0xFFF1F1FA),
-    surfaceContainerLow = Color(0xFFF7F7FC),
+    primary = SoftAccent,
+    secondary = SoftMuted,
+    tertiary = SoftAccentLight,
+    background = SoftBackground,
+    surface = SoftBackground,
+    surfaceContainer = SoftBackground,
+    surfaceContainerLow = SoftBackground,
+    surfaceVariant = SoftBackground,
     onPrimary = Color.White,
-    onSecondary = Color.White,
+    onSecondary = SoftForeground,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
+    onBackground = SoftForeground,
+    onSurface = SoftForeground,
+    onSurfaceVariant = SoftMuted,
+    outline = SoftMuted.copy(alpha = 0.45f),
 )
 
 @Composable
