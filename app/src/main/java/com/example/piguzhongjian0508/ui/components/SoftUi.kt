@@ -119,14 +119,27 @@ fun SoftHeader(
     title: String,
     modifier: Modifier = Modifier,
     onBack: (() -> Unit)? = null,
+    height: Dp = 72.dp,
+    slotHeight: Dp = 50.dp,
 ) {
-    Box(
-        modifier = modifier
+    val isDefaultHeader = height == 72.dp && slotHeight == 50.dp
+    val headerModifier = if (isDefaultHeader) {
+        modifier
             .fillMaxWidth()
             .background(SoftBackground)
             .padding(horizontal = 20.dp)
             .padding(top = 12.dp, bottom = 14.dp)
-            .height(72.dp),
+            .height(height)
+    } else {
+        modifier
+            .fillMaxWidth()
+            .height(height)
+            .background(SoftBackground)
+            .padding(horizontal = 20.dp)
+    }
+
+    Box(
+        modifier = headerModifier,
         contentAlignment = Alignment.Center,
     ) {
         if (onBack != null) {
@@ -144,7 +157,7 @@ fun SoftHeader(
 
         SoftInsetSurface(
             modifier = Modifier
-                .height(50.dp)
+                .height(slotHeight)
                 .widthIn(min = 168.dp, max = 220.dp),
             shape = RoundedCornerShape(25.dp),
             cornerRadius = 25.dp,

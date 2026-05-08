@@ -26,16 +26,16 @@ fun ProfileScreen(onOpenSettings: () -> Unit) {
         "我的资料",
         "消息通知",
         "健康报告",
-        "设备管理",
-        "会员中心",
         "设置",
+        "会员中心",
+        "设备管理",
         "关于我们",
     )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            SoftHeader(title = "个人中心")
+            SoftHeader(title = "个人中心", height = 52.dp, slotHeight = 50.dp)
         },
     ) { innerPadding ->
         LazyColumn(
